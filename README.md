@@ -16,6 +16,9 @@ Rather than hand-designing a controller, this project uses **reinforcement learn
 - Configurable reward structure and training hyperparameters (`ppo/config.py`),
 - PPO training entrypoint using Stable-Baselines3 (`ppo/train.py`).
 
+## Local Testing
+For step-by-step pull/setup/smoke-test instructions, see [`TESTING.md`](TESTING.md).
+
 ## PPO Quick Start
 ```bash
 python -m venv .venv
