@@ -10,6 +10,28 @@ The challenge is amplified by:
 
 Rather than hand-designing a controller, this project uses **reinforcement learning (RL)** in simulation. The agent learns to walk in a PyBullet environment by maximizing rewards for speed, stability, and energy efficiency.
 
+## Current Development Status
+✅ Initial PPO development scaffold is implemented:
+- Gymnasium-compatible PyBullet humanoid environment (`ppo/env.py`),
+- Configurable reward structure and training hyperparameters (`ppo/config.py`),
+- PPO training entrypoint using Stable-Baselines3 (`ppo/train.py`).
+
+## Local Testing
+For step-by-step pull/setup/smoke-test instructions, see [`TESTING.md`](TESTING.md).
+
+## PPO Quick Start
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python -m ppo.train --timesteps 100000 --run-name ppo_smoke
+```
+
+Artifacts are saved to:
+- `artifacts/models/`
+- `artifacts/logs/`
+- `artifacts/tensorboard/`
+
 ## Approach
 We simulate a humanoid robot from a URDF model in **PyBullet** and wrap the simulator in a **Gymnasium-compatible environment** for use with standard RL libraries.
 
