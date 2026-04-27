@@ -1,5 +1,12 @@
 # Bipedal Locomotion with Reinforcement Learning
 
+Update with:
+   This project currently uses:
+   Miniforge / conda environment biped311
+   pybullet from conda-forge
+   CPU torch
+   OpenMP workaround on Windows
+
 ## Problem Statement
 Walking on two legs is a difficult control problem, but solving it is essential for effective humanoid and terrain-capable robotics. This motion, called **bipedal locomotion**, is inherently unstable and requires continuous feedback control.
 
