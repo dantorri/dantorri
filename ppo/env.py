@@ -34,6 +34,11 @@ class EnvConfig:
 class HumanoidLocomotionEnv(gym.Env[np.ndarray, np.ndarray]):
     """Gymnasium-compatible PyBullet environment for early PPO development."""
 
+    @staticmethod
+    def _angle_diff(a: float, b: float) -> float:
+        """Smallest signed angle difference between two angles."""
+        return float((a - b + np.pi) % (2.0 * np.pi) - np.pi)
+
     metadata = {"render_modes": ["human", "rgb_array", None], "render_fps": 60}
 
     def __init__(self, render_mode: str | None = None, config: EnvConfig | None = None):
@@ -47,9 +52,13 @@ class HumanoidLocomotionEnv(gym.Env[np.ndarray, np.ndarray]):
         p.setGravity(0, 0, -9.81, physicsClientId=self.client)
         p.setTimeStep(self.config.simulation_timestep, physicsClientId=self.client)
 
-        # Try this first. It usually fixes the "sideways humanoid" issue.
-        self.initial_base_pos = [0.0, 0.0, 4.0]
-        self.initial_base_orn = p.getQuaternionFromEuler([1.5708, 0.0, 0.0])
+        # Upright starting pose.
+        # The old 90-degree roll exceeded the fall threshold immediately.
+        self.initial_base_pos = [0.0, 0.0, 3.55]
+        self.initial_base_orn = p.getQuaternionFromEuler([1.57, 0.0, 0.0])
+        self.initial_roll, self.initial_pitch, self.initial_yaw = p.getEulerFromQuaternion(
+        self.initial_base_orn
+        )
 
         self.plane_id = p.loadURDF("plane.urdf", physicsClientId=self.client)
         self.robot_id = p.loadURDF(
@@ -126,10 +135,21 @@ class HumanoidLocomotionEnv(gym.Env[np.ndarray, np.ndarray]):
     ) -> dict[str, float]:
         cfg = self.config
 
-        speed_err = abs(cfg.target_speed_mps - base_lin_vel_x)
-        forward_reward = float(cfg.reward.forward_velocity * np.exp(-speed_err))
+        # Reward is highest near target speed, zero-ish at no movement,
+        # and negative if the robot moves badly away from the target.
+        target_speed = max(float(cfg.target_speed_mps), 1e-6)
+        speed_tracking = 1.0 - abs(float(cfg.target_speed_mps) - base_lin_vel_x) / target_speed
+        # Reward actual forward motion, not just being near target speed.
+        # Positive x velocity is good. Backward velocity is bad.
+        forward_reward = float(cfg.reward.forward_velocity * base_lin_vel_x)
 
+        # Small survival reward, but not enough to make standing still the best policy.
         survival_reward = float(cfg.reward.survival)
+
+        # Penalize very small/no forward movement after early stabilization.
+        stall_penalty = 0.0
+        if self.step_count > 100 and base_lin_vel_x < 0.05:
+            stall_penalty = 0.25
 
         energy_penalty = float(
             cfg.reward.energy * np.sum(np.square(action * cfg.max_torque))
@@ -137,7 +157,13 @@ class HumanoidLocomotionEnv(gym.Env[np.ndarray, np.ndarray]):
 
         fall_penalty = float(cfg.reward.fall_penalty if fell else 0.0)
 
-        total_reward = forward_reward + survival_reward - energy_penalty - fall_penalty
+        total_reward = (
+            forward_reward
+            + survival_reward
+            - stall_penalty
+            - energy_penalty
+            - fall_penalty
+        )
 
         return {
             "forward_reward": forward_reward,
@@ -159,17 +185,6 @@ class HumanoidLocomotionEnv(gym.Env[np.ndarray, np.ndarray]):
             self.initial_base_orn,
             physicsClientId=self.client,
         )
-        base_pos, base_quat = p.getBasePositionAndOrientation(
-            self.robot_id, physicsClientId=self.client
-        )
-        roll, pitch, yaw = p.getEulerFromQuaternion(base_quat)
-
-        print("RESET DEBUG")
-        print("  base_pos :", base_pos)
-        print("  roll     :", roll)
-        print("  pitch    :", pitch)
-        print("  yaw      :", yaw)
-        
         p.resetBaseVelocity(
             self.robot_id, [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], physicsClientId=self.client
         )
@@ -216,10 +231,13 @@ class HumanoidLocomotionEnv(gym.Env[np.ndarray, np.ndarray]):
         base_height = float(base_pos[2])
         base_lin_vel_x = float(obs[7])
 
+        roll_error = self._angle_diff(float(roll), float(self.initial_roll))
+        pitch_error = self._angle_diff(float(pitch), float(self.initial_pitch))
+
         fell = (
             base_height < self.config.min_torso_height
-            or abs(roll) > self.config.max_abs_roll
-            or abs(pitch) > self.config.max_abs_pitch
+            or abs(roll_error) > self.config.max_abs_roll
+            or abs(pitch_error) > self.config.max_abs_pitch
         )
 
         terminated = fell
@@ -235,6 +253,8 @@ class HumanoidLocomotionEnv(gym.Env[np.ndarray, np.ndarray]):
             "roll": float(roll),
             "pitch": float(pitch),
             "yaw": float(yaw),
+            "roll_error": float(roll_error),
+            "pitch_error": float(pitch_error),
             "fell": fell,
             "step_count": self.step_count,
             **reward_parts,

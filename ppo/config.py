@@ -6,10 +6,10 @@ from pathlib import Path
 class RewardWeights:
     """Weights for reward components in the locomotion task."""
 
-    forward_velocity: float = 1.0
-    survival: float = 0.2
-    energy: float = 0.002
-    fall_penalty: float = 40.0
+    forward_velocity: float = 2.0
+    survival: float = 0.05
+    energy: float = 0.00002
+    fall_penalty: float = 10.0
 
 
 @dataclass(slots=True)
@@ -17,7 +17,7 @@ class PPOTrainConfig:
     """Train-time configuration for PPO."""
 
     total_timesteps: int = 500_000
-    target_speed_mps: float = 1.25
+    target_speed_mps: float = 0.4
     max_episode_steps: int = 1000
     max_torque: float = 100.0
     model_dir: Path = Path("artifacts/models")
@@ -37,3 +37,10 @@ class PPOTrainConfig:
     seed: int = 42
 
     reward: RewardWeights = field(default_factory=RewardWeights)
+
+    @dataclass(slots=True)
+    class RewardWeights:
+        forward_velocity: float = 8.0
+        survival: float = 0.01
+        energy: float = 0.000005
+        fall_penalty: float = 40.0

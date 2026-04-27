@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+from unittest import result
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 import argparse
@@ -42,6 +43,9 @@ def evaluate_episode(model: PPO, env: HumanoidLocomotionEnv, deterministic: bool
     initial_x = float(obs[0])
 
     x_velocities: list[float] = []
+    forward_rewards = []
+    stall_penalties = []
+    energy_penalties = []
     final_info: dict = {}
 
     while not done:
@@ -54,6 +58,9 @@ def evaluate_episode(model: PPO, env: HumanoidLocomotionEnv, deterministic: bool
 
         x_velocities.append(float(info.get("base_lin_vel_x", 0.0)))
         final_info = info
+        forward_rewards.append(float(info.get("forward_reward", 0.0)))
+        stall_penalties.append(float(info.get("stall_penalty", 0.0)))
+        energy_penalties.append(float(info.get("energy_penalty", 0.0)))
 
     final_x = float(obs[0])
     forward_distance = final_x - initial_x
@@ -66,6 +73,9 @@ def evaluate_episode(model: PPO, env: HumanoidLocomotionEnv, deterministic: bool
         "avg_forward_velocity": avg_forward_velocity,
         "fell": bool(final_info.get("fell", False)),
         "final_base_height": float(final_info.get("base_height", 0.0)),
+        "avg_forward_reward": float(np.mean(forward_rewards)) if forward_rewards else 0.0,
+        "avg_stall_penalty": float(np.mean(stall_penalties)) if stall_penalties else 0.0,
+        "avg_energy_penalty": float(np.mean(energy_penalties)) if energy_penalties else 0.0,
     }
 
 
@@ -95,6 +105,9 @@ def main() -> None:
             print(f"  avg forward velocity: {result['avg_forward_velocity']:.3f} m/s")
             print(f"  fell                : {result['fell']}")
             print(f"  final base height   : {result['final_base_height']:.3f}")
+            print(f"  avg forward reward : {result['avg_forward_reward']:.3f}")
+            print(f"  avg stall penalty  : {result['avg_stall_penalty']:.3f}")
+            print(f"  avg energy penalty : {result['avg_energy_penalty']:.3f}")
 
         rewards = np.array([r["episode_reward"] for r in results], dtype=np.float64)
         steps = np.array([r["episode_steps"] for r in results], dtype=np.float64)
