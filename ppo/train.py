@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+import os
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+
+import torch
 import argparse
 from pathlib import Path
 
@@ -15,18 +19,6 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Train PPO on humanoid locomotion task")
     parser.add_argument("--timesteps", type=int, default=None, help="Override total timesteps")
     parser.add_argument("--run-name", type=str, default="ppo_humanoid", help="Output prefix")
-    parser.add_argument(
-        "--target-speed",
-        type=float,
-        default=None,
-        help="Override target forward speed in m/s",
-    )
-    parser.add_argument(
-        "--max-episode-steps",
-        type=int,
-        default=None,
-        help="Override max steps per episode",
-    )
     return parser.parse_args()
 
 
@@ -54,10 +46,6 @@ def main() -> None:
     cfg = PPOTrainConfig()
     if args.timesteps is not None:
         cfg.total_timesteps = args.timesteps
-    if args.target_speed is not None:
-        cfg.target_speed_mps = args.target_speed
-    if args.max_episode_steps is not None:
-        cfg.max_episode_steps = args.max_episode_steps
 
     ensure_dirs(cfg.model_dir, cfg.log_dir, cfg.tensorboard_log_dir)
 
