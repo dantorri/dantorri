@@ -1,164 +1,48 @@
-# Bipedal Locomotion with Reinforcement Learning
+# Hi, I'm Daniel Torri
 
-## Current Workflow (Train 100k, Evaluate, Render)
-This repository now supports an end-to-end PPO workflow:
-1. Create/use Miniforge conda env `biped311`.
-2. Run a smoke test to validate physics + control.
-3. Train PPO for 100k timesteps.
-4. Evaluate the saved model.
-5. Render the learned gait in PyBullet GUI.
+I'm a mechanical engineering student focused on robotics, automation, embedded systems, controls, and applied machine learning.
 
-## Next Steps
-See [`NEXT_STEPS.md`](NEXT_STEPS.md) for a concrete execution plan after initial setup.
+I enjoy building systems that connect mechanical design, electronics, software, and real-world testing. My current interests include robotics for manufacturing automation, reinforcement learning, embedded control, drones, and autonomous systems.
 
-## Setup (Miniforge / conda)
-```bash
-conda create -n biped311 python=3.11 -y
-conda activate biped311
-pip install -r requirements.txt
-```
+## Featured Projects
 
-## 1) Smoke Test Environment
-```bash
-python -m ppo.smoke_test --episodes 2 --steps 300
-```
+### Reinforcement Learning Biped Simulation
+Python-based reinforcement learning project focused on simulated biped/humanoid locomotion using PPO and SAC-style workflows.
 
-## 2) Train PPO for 100k timesteps
-```bash
-python -m ppo.train --timesteps 100000 --run-name ppo_100k
-```
+- Repository: [ML_Biped](https://github.com/dantorri/ML_Biped)
+- Focus areas: reinforcement learning, robotics simulation, reward shaping, gait behavior, evaluation workflows
 
-Expected artifact:
-- `artifacts/models/ppo_100k.zip`
+### Amphibious Robotics
+Senior design and robotics work focused on land-water robotic mobility, freshwater environments, treaded locomotion, and communication across challenging environments.
 
-## 3) Evaluate trained model
-```bash
-python -m ppo.eval --model artifacts/models/ppo_100k.zip --episodes 5 --max-steps 2000
-```
+- Focus areas: robot design, RF communication, waterproofing, mobility, testing
 
-## 4) Render trained policy
-```bash
-python -m ppo.render --model artifacts/models/ppo_100k.zip --episodes 2 --max-steps 2000
-```
+### ODrive-Powered Exoskeleton Testing
+High-power robotic system using ODrive motor controllers, linear rails, torque control, and elastic energy storage.
 
-## Troubleshooting Humanoid Spawn / Rigid Behavior
-If the humanoid is sideways, in-ground, or appears rigid:
-- Pull latest code (`ppo/env.py`) where reset now rebuilds the simulation world each episode.
-- Ensure default joint motors are disabled before torque control.
-- Re-run smoke test before training.
+- Focus areas: embedded control, motor control, torque commands, serial communication, safety testing
 
-## Project Overview
-We train a bipedal humanoid controller in PyBullet using reinforcement learning. The current implementation focuses on PPO with configurable reward components for forward velocity, survival, energy usage, and fall penalties.
+### Automation and PLC-Style Logic
+Arduino and PLC-style automation practice related to industrial controls, block logic, sensing, actuation, and manufacturing automation.
 
-## Files
-- `ppo/env.py` — Gymnasium-compatible PyBullet humanoid environment.
-- `ppo/config.py` — training and reward hyperparameters.
-- `ppo/train.py` — PPO training entrypoint.
-- `ppo/smoke_test.py` — random-action environment verification.
-- `ppo/eval.py` — deterministic model evaluation.
-- `ppo/render.py` — GUI gait playback for trained models.
-- `TESTING.md` — step-by-step local testing guide.
-Update with:
-   This project currently uses:
-   Miniforge / conda environment biped311
-   pybullet from conda-forge
-   CPU torch
-   OpenMP workaround on Windows
+- Focus areas: production automation, controls logic, sensors, actuators, debugging
 
-## Problem Statement
-Walking on two legs is a difficult control problem, but solving it is essential for effective humanoid and terrain-capable robotics. This motion, called **bipedal locomotion**, is inherently unstable and requires continuous feedback control.
+## Technical Skills
 
-The challenge is amplified by:
-- Nonlinear dynamics,
-- High-dimensional state and action spaces, and
-- Frequent contact changes with the ground.
+**Programming:** Python, C/C++ for Arduino and embedded systems, MATLAB, Java, JavaScript  
+**Robotics and Controls:** ODrive, motor drivers, encoders, IMUs, PID control, torque control, simulation  
+**Embedded Systems:** Teensy, Arduino, ESP32, Raspberry Pi, I2C, UART, PWM, sensor integration  
+**Mechanical and Prototyping:** CAD, 3D printing, manual mill/lathe, mechanism design, test fixtures  
+**Software Tools:** Git, GitHub, VS Code, Linux basics, React, Node/Express, MongoDB
 
-Rather than hand-designing a controller, this project uses **reinforcement learning (RL)** in simulation. The agent learns to walk in a PyBullet environment by maximizing rewards for speed, stability, and energy efficiency.
+## Current Focus
 
-## Current Development Status
-✅ Initial PPO development scaffold is implemented:
-- Gymnasium-compatible PyBullet humanoid environment (`ppo/env.py`),
-- Configurable reward structure and training hyperparameters (`ppo/config.py`),
-- PPO training entrypoint using Stable-Baselines3 (`ppo/train.py`).
+- Organizing my GitHub into a clean engineering portfolio
+- Building robotics projects with better documentation and repeatable setup instructions
+- Learning simulation workflows for robotics and reinforcement learning
+- Creating a personal portfolio website through GitHub Pages
 
-## Local Testing
-For step-by-step pull/setup/smoke-test instructions, see [`TESTING.md`](TESTING.md).
+## Connect
 
-## PPO Quick Start
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-python -m ppo.train --timesteps 100000 --run-name ppo_smoke
-```
-
-Artifacts are saved to:
-- `artifacts/models/`
-- `artifacts/logs/`
-- `artifacts/tensorboard/`
-
-## Approach
-We simulate a humanoid robot from a URDF model in **PyBullet** and wrap the simulator in a **Gymnasium-compatible environment** for use with standard RL libraries.
-
-### Observation space
-The policy receives:
-- Torso position and orientation,
-- Linear and angular velocity,
-- Joint angles, and
-- Joint velocities.
-
-### Action space
-A continuous action vector specifies target joint torques for each actuated joint, subject to maximum torque limits.
-
-### Reward design
-The reward function combines:
-1. Forward-velocity tracking toward a target speed and direction,
-2. Survival bonus per timestep,
-3. Penalty for energy consumption,
-4. Large fall penalty with early episode termination.
-
-Reward weights are treated as tunable hyperparameters.
-
-## Algorithms Compared
-This project compares two policy-gradient methods implemented in **Stable-Baselines3**:
-
-- **PPO** (on-policy): uses a clipped surrogate objective for stable policy updates.
-- **SAC** (off-policy actor-critic): maximizes expected return and policy entropy to improve exploration.
-
-Both methods use MLP policy/value networks trained with gradient descent, linking directly to optimization methods covered in course material.
-
-## Evaluation Metrics
-We will compare PPO and SAC using:
-- Cumulative reward,
-- Forward distance traveled,
-- Timesteps before falling,
-- Energy cost per meter,
-- Wall-clock training time and sample efficiency.
-
-## Ethical Considerations
-Key ethical risks include:
-
-1. **Simulation-to-real transfer risk**: policies that are safe in simulation may fail unpredictably on hardware.
-   - Mitigation: enforce torque/joint limits and safety constraints before real-world deployment.
-2. **Potential misuse**: bipedal robots may be deployed for surveillance, raising privacy concerns.
-3. **Socioeconomic impacts**: increased automation can contribute to job displacement in some sectors.
-
-## Software and Compute
-- **Software**: Python, PyBullet, Stable-Baselines3, Gymnasium, PyTorch, Matplotlib.
-- **Compute**: personal machines with GPU acceleration.
-- **Expected training budget**: approximately 1–5 million timesteps, typically several hours on modern GPUs.
-
-## References
-1. Coumans & Bai, *PyBullet Physics Simulation*.
-2. Fujimoto et al., *TD3* (potential additional baseline).
-3. Haarnoja et al., *Soft Actor-Critic (SAC)*.
-4. Raffin et al., *Stable-Baselines3*.
-5. Schulman et al., *Proximal Policy Optimization (PPO)*.
-6. Sutton & Barto, *Reinforcement Learning: An Introduction*.
-
-## Expected Deliverables
-1. Trained PPO and SAC policies that achieve stable bipedal walking,
-2. Training curves and comparative PPO vs. SAC analysis,
-3. Reward ablation study isolating reward-component effects,
-4. Video recordings of gait behavior at multiple training stages,
-5. Final report with ethical discussion of sim-to-real deployment risk.
+- GitHub: [github.com/dantorri](https://github.com/dantorri)
+- Portfolio site: coming soon

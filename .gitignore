@@ -1,4 +1,10 @@
-__pycache__/
-*.py[cod]
-.venv/
-artifacts/
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.vs/
+
+# Temporary files
+*.tmp
+*.log
