@@ -1,48 +1,34 @@
-# Hi, I'm Daniel Torri
+# Daniel Torri
 
-I'm a mechanical engineering student focused on robotics, automation, embedded systems, controls, and applied machine learning.
+Mechanical engineer working across robotics, embedded control, and machine learning. Virginia Tech, B.S. Mechanical Engineering, May 2026 — Robotics and Mechatronics, with a Computer Science minor.
 
-I enjoy building systems that connect mechanical design, electronics, software, and real-world testing. My current interests include robotics for manufacturing automation, reinforcement learning, embedded control, drones, and autonomous systems.
+I like working where software meets something physical. That has taken me from production automation and exoskeleton test hardware to humanoid learning and the problem of getting a radio signal through water.
 
-## Featured Projects
+[Projects & engineering notes](https://dantorri.github.io/) · [Email](mailto:danieltorri@vt.edu)
 
-### Reinforcement Learning Biped Simulation
-Python-based reinforcement learning project focused on simulated biped/humanoid locomotion using PPO and SAC-style workflows.
+## Robots, radios, and a few experiments
 
-- Repository: [ML_Biped](https://github.com/dantorri/ML_Biped)
-- Focus areas: reinforcement learning, robotics simulation, reward shaping, gait behavior, evaluation workflows
+**[Amphibious robot](https://dantorri.github.io/projects/amphibious.html)**
 
-### Amphibious Robotics
-Senior design and robotics work focused on land-water robotic mobility, freshwater environments, treaded locomotion, and communication across challenging environments.
+A land-water senior design platform. My work includes RF and Wi-Fi integration and embedded motor control. A separate MuJoCo study explores learning to coordinate the drivetrain and powered front arm over obstacles; those policies remain simulation-only.
 
-- Focus areas: robot design, RF communication, waterproofing, mobility, testing
+**[Underwater RF](https://dantorri.github.io/projects/underwater-rf.html)**
 
-### ODrive-Powered Exoskeleton Testing
-High-power robotic system using ODrive motor controllers, linear rails, torque control, and elastic energy storage.
+The communications side of the amphibious project: investigating low-frequency RF, antenna placement, and EMI mitigation for telemetry through water. Frequency choice, antenna packaging, and motor electronics all become part of the communications problem.
 
-- Focus areas: embedded control, motor control, torque commands, serial communication, safety testing
+**[Humanoid locomotion](https://dantorri.github.io/projects/locomotion.html)** · [Code](https://github.com/dantorri/ML_Humanoid)
 
-### Automation and PLC-Style Logic
-Arduino and PLC-style automation practice related to industrial controls, block logic, sensing, actuation, and manufacturing automation.
+A team comparison of PPO and SAC on a 13-DoF PyBullet walking task, with Drew Burcher and Nathan Wyatt. SAC reached about 1.6 m/s in simulation; PPO did not achieve a sustained gait within the project timeline. The training curves and awkward gaits are as useful as the headline result.
 
-- Focus areas: production automation, controls logic, sensors, actuators, debugging
+**[Other builds](https://dantorri.github.io/#projects)**
 
-## Technical Skills
+A constrained test frame for a jumping exoskeleton, a 5-DoF arm with forward/inverse kinematics, an ArduPilot quadrotor, and TarsiGrip, a capillary gripper concept.
 
-**Programming:** Python, C/C++ for Arduino and embedded systems, MATLAB, Java, JavaScript  
-**Robotics and Controls:** ODrive, motor drivers, encoders, IMUs, PID control, torque control, simulation  
-**Embedded Systems:** Teensy, Arduino, ESP32, Raspberry Pi, I2C, UART, PWM, sensor integration  
-**Mechanical and Prototyping:** CAD, 3D printing, manual mill/lathe, mechanism design, test fixtures  
-**Software Tools:** Git, GitHub, VS Code, Linux basics, React, Node/Express, MongoDB
+## Along the way
 
-## Current Focus
+- **Boeing:** production automation and manufacturing R&D internship — AGV-mounted robotics, cobot concepts, metrology, and passive exoskeleton trials.
+- **Virginia Tech Assistive Robotics Lab:** test-frame design and prototyping for a high-power jumping exoskeleton.
+- **Virginia Tech MAAP:** MATLAB viewshed tools and C++ spectrum-data logging for drone research.
+- **Competitive Robotics Organization:** mechanical lead and mentor; our 2024 SoutheastCon team took first in hardware and design.
 
-- Organizing my GitHub into a clean engineering portfolio
-- Building robotics projects with better documentation and repeatable setup instructions
-- Learning simulation workflows for robotics and reinforcement learning
-- Creating a personal portfolio website through GitHub Pages
-
-## Connect
-
-- GitHub: [github.com/dantorri](https://github.com/dantorri)
-- Portfolio site: coming soon
+Most often using **Python, C++, MATLAB, CAD, ESP32, PyBullet, MuJoCo, and Stable-Baselines3**. FAA Part 107 remote pilot.
